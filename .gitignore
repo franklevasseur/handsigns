@@ -1,0 +1,11 @@
+.venv
+.secrets.*
+__pycache__
+.pytest_cache
+.DS_Store
+.cache
+openbook.toml
+
+.env
+.env.*
+*.log
