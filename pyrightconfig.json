@@ -1,0 +1,28 @@
+{
+  "include": ["src"],
+  "exclude": ["**/__pycache__", ".env"],
+  "ignore": [],
+
+  "stubPath": "",
+  "venv": ".venv",
+
+  "reportMissingImports": true,
+  "reportMissingTypeStubs": false,
+
+  "pythonVersion": "3.9",
+  "pythonPlatform": "All",
+
+  "typeCheckingMode": "basic",
+
+  "reportUnnecessaryComparison": "error",
+  "reportIncompatibleMethodOverride": "error",
+  "reportMissingTypeArgument": "error",
+
+  "reportPrivateImportUsage": "none",
+  "reportUnusedImport": "warning",
+
+  "reportUnusedFunction": "none",
+  "reportInvalidTypeVarUse": "information",
+
+  "reportIncompatibleVariableOverride": "error"
+}
