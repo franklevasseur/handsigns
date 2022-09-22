@@ -16,9 +16,19 @@ clean: ## clean project from dependencies and configurations
 	@pip uninstall -r requirements.txt -y
 
 
-start: ## start a model webserver for inference
+collect: ## collect data for training purposes
 	$(call preconditions)
-	@python -m src
+	@python -m src collect --dest ./data/$(l).csv
+
+
+train: ## train model
+	$(call preconditions)
+	@python -m src train --data-dir ./data --model-dest ./model.pkl
+
+
+predict: ## predict using model
+	$(call preconditions)
+	@python -m src predict --model-path ./model.pkl
 
 
 lint: ## check for linting issues in the codebase
