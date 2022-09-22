@@ -6,6 +6,14 @@ import sklearn.svm as svm
 
 Sample = tuple[float, float, float, str]
 
+labels: list[str] = []
+
+
+def label_to_int(label: str) -> int:
+    if label not in labels:
+        labels.append(label)
+    return labels.index(label)
+
 
 def train(data_dir: str, model_dest: str) -> None:
 
@@ -22,8 +30,8 @@ def train(data_dir: str, model_dest: str) -> None:
                 all_samples.append((float(row[0]), float(row[1]), float(row[2]), label))
 
     model = svm.SVC(kernel='linear', C=1.0)
-    y = [s[3] for s in all_samples]
-    X = [s[:3] for s in all_samples]
+    y = [label_to_int(s[3]) for s in all_samples]
+    X = [list(s[:3]) for s in all_samples]
     model.fit(X, y)
 
     with open(model_dest, 'wb') as f:
