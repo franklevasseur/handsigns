@@ -1,10 +1,11 @@
 import csv
-import os
+import pathlib as pl
 import pickle
 from dataclasses import dataclass
 
 import sklearn.svm as svm
 
+from . import logger as log
 from .typings import TrainArtifact
 
 
@@ -22,18 +23,20 @@ def mk_label_to_int(labels: list[str]):
     return cb
 
 
-def train(data_dir: str, model_dest: str) -> None:
+def train(data_dir: pl.Path, model_dest: pl.Path, logger: log.Logger) -> None:
 
-    all_sources = [f for f in os.listdir(data_dir) if f.endswith('.csv')]
+    logger.info(f"Training model with data from {data_dir}")
+
+    all_sources = [f for f in data_dir.iterdir() if f.name.endswith('.csv')]
     all_samples: list[Sample] = []
 
     labels: list[str] = []
     label_to_int = mk_label_to_int(labels)
 
-    for file_name in all_sources:
-        file_name = os.path.join(data_dir, file_name)
-        label = file_name.split(os.sep)[-1].split('.')[0]
-        with open(file_name, 'r', newline='') as f:
+    for file_path in all_sources:
+        file_path = data_dir / file_path
+        label = file_path.stem
+        with open(file_path, 'r', newline='') as f:
             reader = csv.reader(f, delimiter=',', lineterminator='\n')
             for row in reader:
                 x = [float(f) for f in row]

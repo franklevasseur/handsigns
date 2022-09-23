@@ -1,3 +1,4 @@
+import pathlib as pl
 import pickle
 from typing import cast
 
@@ -5,11 +6,13 @@ import cv2
 import numpy as np
 import numpy.typing as npt
 
-from src.typings import TrainArtifact
-from src.videohandle import Result, VideoHandler
+from . import logger as log
+from .typings import TrainArtifact
+from .videohandle import Result, VideoHandler
 
 
-def predict(model_path: str):
+def predict(model_path: pl.Path, logger: log.Logger) -> None:
+    logger.info(f"Predicting with model {model_path}")
 
     with open(model_path, 'rb') as f:
         artifact: TrainArtifact = pickle.load(f)

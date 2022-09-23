@@ -1,14 +1,17 @@
 import csv
+import pathlib as pl
 from typing import TypeAlias, cast
 
 import cv2
 
-from src.videohandle import Result, VideoHandler
+from . import logger as log
+from .videohandle import Result, VideoHandler
 
 Sample: TypeAlias = list[float]
 
 
-def collect(file_destination: str):
+def collect(file_destination: pl.Path, logger: log.Logger) -> None:
+    logger.info(f"Collecting data to {file_destination}")
 
     all_samples: list[Sample] = []
 
