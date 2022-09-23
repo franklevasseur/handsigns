@@ -5,9 +5,9 @@ from . import datacollect as dc, predict as pr, train as tr
 
 @click.command()
 @click.option('--data-dest', help='Path to save data')
-def collect(dest: str):
+def collect(data_dest: str):
     """Collect Data for a a given label."""
-    dc.collect(dest)
+    dc.collect(data_dest)
 
 
 @click.command()

@@ -18,7 +18,7 @@ clean: ## clean project from dependencies and configurations
 
 collect: ## collect data for training purposes
 	$(call preconditions)
-	@python -m src collect --dest ./data/$(l).csv
+	@python -m src collect --data-dest ./data/$(l).csv
 
 
 train: ## train model

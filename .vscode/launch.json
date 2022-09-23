@@ -5,11 +5,11 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Debug Main",
+      "name": "Debug Prediction",
       "type": "python",
       "request": "launch",
       "module": "src",
-      "args": [],
+      "args": ["predict", "--model-path", "./model.pkl"],
       "console": "integratedTerminal",
       "justMyCode": true,
       "envFile": "${workspaceFolder}/.env"
