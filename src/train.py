@@ -39,7 +39,7 @@ def train(data_dir: str, model_dest: str) -> None:
                 x = [float(f) for f in row]
                 all_samples.append(Sample(x=x, y=label_to_int(label)))
 
-    model = svm.SVC(kernel='linear', C=1.0)
+    model = svm.SVC(kernel='linear', C=1.0, probability=True)
     y = [s.y for s in all_samples]
     X = [s.x for s in all_samples]
     model.fit(X, y)

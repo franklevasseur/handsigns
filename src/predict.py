@@ -2,7 +2,8 @@ import pickle
 from typing import cast
 
 import cv2
-import sklearn.svm as svm
+import numpy as np
+import numpy.typing as npt
 
 from src.typings import TrainArtifact
 from src.videohandle import Result, VideoHandler
@@ -20,10 +21,18 @@ def predict(model_path: str):
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 sample: list[float] = [cast(float, f) for lm in hand_landmarks.landmark for f in [lm.x, lm.y, lm.z]]
-                model_output = model.predict([sample])
-                prediction_int = model_output[0]
-                prediction_label = labels[prediction_int]
-                cv2.putText(img, prediction_label, (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                model_output: npt.NDArray[np.float64] = model.predict_proba([sample])
+                prediction_confs: npt.NDArray[np.float64] = model_output[0]
+                prediction_idx = np.argmax(prediction_confs)
+                prediction_conf = prediction_confs[prediction_idx]
+                prediction_label = labels[prediction_idx]
+
+                if (prediction_conf < 0.75):
+                    prediction_label = 'none'
+                    prediction_conf = 1 - prediction_conf
+
+                cv2.putText(img, prediction_label, (10, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+                cv2.putText(img, f"x={prediction_conf:,.2f}", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
 
         return img
 
