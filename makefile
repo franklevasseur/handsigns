@@ -16,33 +16,21 @@ clean: ## clean project from dependencies and configurations
 	@pip uninstall -r requirements.txt -y
 
 
-collect: ## collect data for training purposes
+start: ## start default entry program
 	$(call preconditions)
-	@python -m src collect --data-dest ./data/$(l).csv
-
-
-train: ## train model
-	$(call preconditions)
-	@python -m src train --data-dir ./data --model-dest ./model.pkl
-
-
-predict: ## predict using model
-	$(call preconditions)
-	@python -m src predict --model-path ./model.pkl
+	@python -m src
 
 
 lint: ## check for linting issues in the codebase
 	$(call preconditions)
 	@python -m pycodestyle --exclude='.venv,.git,.env'  --ignore=E501,E741,W504,W503,E731,E704 .
 	@python -m isort --ca --line-length=140 --check-only .
-	@python scripts/sort_requirements.py --check-only -r requirements.txt
 
 
 format: ## auto fix most linting issues in the codebase
 	$(call preconditions)
 	@python -m autopep8 --in-place --recursive -a -a --exclude=.env --ignore=E501,E741,W504,W503,E731,E704 --max-line-length=140 --experimental . 
 	@python -m isort --ca --line-length=140 .
-	@python scripts/sort_requirements.py -r requirements.txt
 
 
 test: ## run unit tests
