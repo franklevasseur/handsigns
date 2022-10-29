@@ -20,12 +20,17 @@ class VideoHandler:
         self.mp_draw = mp.solutions.drawing_utils  # type: ignore
         self.cb = cb
 
+        self.killed = False
+
         # Check if the webcam is opened correctly
         if not self.cap.isOpened():
             raise IOError("Cannot open webcam")
 
+    def kill(self) -> None:
+        self.killed = True
+
     def run(self) -> None:
-        while True:
+        while not self.killed:
             success, img = self.cap.read()
             imgRGB = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
             results = self.hands.process(imgRGB)

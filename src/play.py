@@ -23,3 +23,6 @@ def play(model_path: pl.Path, media_dir: pl.Path, logger: log.Logger) -> None:
     videoHandler_thread = threading.Thread(target=videoHandler.run)
     videoHandler_thread.start()
     game.run()
+
+    videoHandler.kill()
+    videoHandler_thread.join()
