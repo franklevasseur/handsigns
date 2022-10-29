@@ -10,6 +10,11 @@ install: # install dependencies and setup
 	@python -m pip install --upgrade pip
 	@pip install -r requirements.txt
 
+lock: ## install only minial dependencies and freeze
+	$(call preconditions)
+	@python -m pip install --upgrade pip
+	@pip install -r requirements.min.txt
+	@pip freeze > requirements.txt
 
 clean: ## clean project from dependencies and configurations
 	$(call preconditions)

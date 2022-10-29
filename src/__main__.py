@@ -4,11 +4,12 @@ import click
 import questionary as q
 from click_default_group import DefaultGroup
 
-from . import datacollect as dc, logger as log, predict as pr, train as tr
+from . import datacollect as dc, logger as log, play as ply, predict as pr, train as tr
 
 CWD = pl.Path.cwd()
 DEFAULT_DATA_DIR = CWD / "data"
 DEFAULT_MODEL_FILE = CWD / "model.pkl"
+DEFAULT_MEDIA_DIR = CWD / "media"
 
 logger = log.Logger()
 
@@ -53,10 +54,20 @@ def predict(model: str):
 
 
 @cli.command()
+@click.option('--model', help='Path to trained model', default=DEFAULT_MODEL_FILE)
+@click.option('--media-dir', help='Path to media directory', default=DEFAULT_MEDIA_DIR)
+def play(model: str, media_dir: str):
+    """Play game."""
+    ply.play(pl.Path(model), pl.Path(media_dir), logger)
+
+
+@cli.command()
 def menu():
     """Launch the menu."""
-    choices = ['collect', 'train', 'predict']
+    choices = ['play', 'collect', 'train', 'predict']
     choice = q.select('What do you want to do?', choices=choices).ask()
+    if choice == 'play':
+        play()
     if choice == 'collect':
         collect()
     elif choice == 'train':
