@@ -31,6 +31,10 @@ class HandController(Controller):
     def symbol(self) -> str:
         return self._symbol
 
+    @property
+    def all_symbols(self) -> list[str]:
+        return self.labels
+
     def handle_sample(self, img: cv2.Mat, results: Result) -> cv2.Mat:
         self._reset()
 
