@@ -24,6 +24,11 @@ def predict(model_path: pl.Path, logger: log.Logger) -> None:
         if results.multi_hand_landmarks:
             for hand_landmarks in results.multi_hand_landmarks:
                 sample: list[float] = [cast(float, f) for lm in hand_landmarks.landmark for f in [lm.x, lm.y, lm.z]]
+                for hand_landmark in hand_landmarks.landmark:
+                    x = int(hand_landmark.x * img.shape[1])
+                    y = int(hand_landmark.y * img.shape[0])
+                    cv2.circle(img, (x, y), 2, (0, 0, 255), -1)
+
                 model_output: npt.NDArray[np.float64] = model.predict_proba([sample])
                 prediction_confs: npt.NDArray[np.float64] = model_output[0]
                 prediction_idx = np.argmax(prediction_confs)
