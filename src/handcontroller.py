@@ -68,6 +68,10 @@ class HandController(Controller):
         return img
 
     def _handle_right(self, img: cv2.Mat, right: Any) -> cv2.Mat:
+
+        for lm in right.landmark:
+            cv2.circle(img, (int(lm.x * img.shape[1]), int(lm.y * img.shape[0])), 2, (0, 255, 0), -1)
+
         sample: list[float] = [cast(float, f) for lm in right.landmark for f in [lm.x, lm.y, lm.z]]
         model_output: npt.NDArray[np.float64] = self.model.predict_proba([sample])
         prediction_confs: npt.NDArray[np.float64] = model_output[0]
