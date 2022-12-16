@@ -15,6 +15,7 @@ SCREEN_TITLE: str = 'Escape the Dungeon'
 WELCOME_MESSAGE = 'Hello Denis... Welcome to the Dungeon of Infinity... Try to escape... Good luck...'
 
 CHARACTER_SCALING = 0.15
+KEY_INDICATOR_SCALING = 0.20
 WALL_SCALING = 0.5
 FLOOR_SCALING = 1
 PLAYER_MOVEMENT_SPEED = 0.05
@@ -27,9 +28,10 @@ SIZE_PER_CHAR = 4
 WALL_RESSOURCE = ":resources:images/tiles/stoneCenter.png"
 FLOOR_RESSOURCE = ":resources:images/topdown_tanks/tileSand2.png"
 DOOR_RESSOURCE = ":resources:images/tiles/doorClosed_mid.png"
+KEY_RESSOURCE = ":resources:images/items/keyYellow.png"
 
 
-def PLAYER_RESSOUCE(media_dir: pl.Path | str): return str(media_dir / pl.Path('images', 'jesus.png'))
+def PLAYER_RESSOURCE(media_dir: pl.Path | str): return str(media_dir / pl.Path('images', 'jesus.png'))
 def MAP_RESSOURCE(media_dir: pl.Path | str): return str(media_dir / pl.Path('maps', 'dungeon_of_infinity.txt'))
 def MUSIC_RESSOURCE(media_dir: pl.Path | str): return str(media_dir / pl.Path('sounds', 'soundtrack.mp3'))
 
@@ -55,6 +57,44 @@ class Door(arcade.Sprite):
         self.alpha = 255
 
 
+class ExitKey(arcade.Sprite):
+
+    def __init__(self, x: float, y: float):
+        super().__init__(KEY_RESSOURCE, WALL_SCALING)
+        self.center_x = x
+        self.center_y = y
+        self._picked_up = False
+
+    @property
+    def picked_up(self):
+        return self._picked_up
+
+    def pickup(self):
+        self._picked_up = True
+
+    def draw(self, *, filter=None, pixelated=None, blend_function=None):
+        if self._picked_up:
+            return
+        return super().draw(filter=filter, pixelated=pixelated, blend_function=blend_function)
+
+
+class Player(arcade.Sprite):
+
+    def __init__(self, media_dir):
+        super().__init__(PLAYER_RESSOURCE(media_dir), CHARACTER_SCALING)
+        self.key_indicator: arcade.Sprite | None = None
+
+    def pickkey(self):
+        self.key_indicator = arcade.Sprite(KEY_RESSOURCE, KEY_INDICATOR_SCALING)
+
+    def draw(self, *, filter=None, pixelated=None, blend_function=None):
+        if self.key_indicator:
+            self.key_indicator.center_x = self.center_x + 30
+            self.key_indicator.center_y = self.center_y + 30
+            self.key_indicator.draw(filter=filter, pixelated=pixelated, blend_function=blend_function)
+        return super().draw(filter=filter, pixelated=pixelated, blend_function=blend_function)
+
+
 class GameWindow(arcade.Window):
 
     def __init__(self, media_dir: pl.Path, controller: Controller):
@@ -72,12 +112,13 @@ class GameWindow(arcade.Window):
         self.my_music: arcade.Sound
         self.media_player: pyglet.media.Player
 
-        self.player_list: arcade.SpriteList
         self.walls: arcade.SpriteList
         self.decorations: arcade.SpriteList
 
         self.doors: list[Door] = []
-        self.player: arcade.Sprite
+        self.player: Player
+        self.exit_key: ExitKey
+
         self.map = load_map(MAP_RESSOURCE(media_dir))
 
     def setup(self):
@@ -87,10 +128,7 @@ class GameWindow(arcade.Window):
         self.my_music = cast(arcade.Sound, arcade.load_sound(MUSIC_RESSOURCE(self.media_dir)))
         self.media_player = self.my_music.play()
 
-        self.player_list = arcade.SpriteList()
-        self.player = arcade.Sprite(PLAYER_RESSOUCE(self.media_dir), CHARACTER_SCALING)
-        self.player_list.append(self.player)
-
+        self.player = Player(self.media_dir)
         self.walls = arcade.SpriteList(use_spatial_hash=True)
         self.decorations = arcade.SpriteList(use_spatial_hash=True)
 
@@ -127,7 +165,10 @@ class GameWindow(arcade.Window):
                     voider.center_y = current_y
                     self.decorations.append(voider)
                     pass
-                elif cell == "floor":
+                elif cell == "floor" or cell == "key":
+                    if cell == "key":
+                        self.exit_key = ExitKey(current_x, current_y)
+
                     floor = arcade.Sprite(FLOOR_RESSOURCE, FLOOR_SCALING)
                     floor.center_x = current_x
                     floor.center_y = current_y
@@ -154,6 +195,11 @@ class GameWindow(arcade.Window):
                 d.open()
             else:
                 d.close()
+
+        collides = arcade.check_for_collision(self.player, self.exit_key)
+        if collides:
+            self.exit_key.pickup()
+            self.player.pickkey()
 
         self.physics_engine.update()
         self.center_camera_to_player()
@@ -186,7 +232,8 @@ class GameWindow(arcade.Window):
         self.clear()
         self.camera.use()
         self.decorations.draw()
-        self.player_list.draw()
+        self.player.draw()
+        self.exit_key.draw()
         self.walls.draw()
         self.draw_welcome_message()
         self.draw_orientation()

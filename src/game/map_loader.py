@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Literal
 
-CellType = Literal["wall", "floor", "door", "spawn", "void"]
+CellType = Literal["wall", "floor", "door", "spawn", "key", "void"]
 Mapp = list[list[CellType]]
 
 
@@ -15,6 +15,8 @@ def cell_to_char(cell: CellType) -> str:
         return "s"
     if cell == "door":
         return "+"
+    if cell == "key":
+        return "k"
 
     return " "
 
@@ -29,6 +31,8 @@ def char_to_cell(char: str) -> CellType:
         return "spawn"
     if char == "+":
         return "door"
+    if char == "k":
+        return "key"
 
     return "void"
 
