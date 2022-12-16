@@ -1,7 +1,7 @@
 import pyglet
 
 from . import logger as log
-from .game.typings import Controller, Orientation
+from .game.typings import Controller, KeyDetector, Orientation
 
 DEFAULT_ORIENTATION = ((0.0, 0.0), (0.0, 0.0))
 DEFAULT_SYMBOL = 'none'
@@ -15,7 +15,7 @@ class KeyboardController(Controller):
         self.logger = logger
         self._key_pressed: list[int] = []
 
-    def check_in(self, w: pyglet.window.Window) -> None:
+    def check_in(self, w: KeyDetector) -> None:
         w.on_key_press = self._on_key_press
         w.on_key_release = self._on_key_release
 

@@ -24,11 +24,14 @@ WALL_SIZE = 64
 CHAR_SIZE = 14
 SIZE_PER_CHAR = 4
 
+EMPTY_HIT_BOX: arcade.PointList = [(0.0, 0.0)]
+
 
 WALL_RESSOURCE = ":resources:images/tiles/stoneCenter.png"
 FLOOR_RESSOURCE = ":resources:images/topdown_tanks/tileSand2.png"
 DOOR_RESSOURCE = ":resources:images/tiles/doorClosed_mid.png"
 KEY_RESSOURCE = ":resources:images/items/keyYellow.png"
+EXIT_DOOR_RESSOURCE = ":resources:images/tiles/lockYellow.png"
 
 
 def PLAYER_RESSOURCE(media_dir: pl.Path | str): return str(media_dir / pl.Path('images', 'jesus.png'))
@@ -44,12 +47,10 @@ class Door(arcade.Sprite):
         self.center_y = y
 
         self._default_hit_box = self.hit_box
-        self._empty_hit_box: arcade.PointList = [(0.0, 0.0)]
-
         self.key = key
 
     def open(self):
-        self.set_hit_box(self._empty_hit_box)
+        self.set_hit_box(EMPTY_HIT_BOX)
         self.alpha = 125
 
     def close(self):
@@ -94,6 +95,25 @@ class Player(arcade.Sprite):
             self.key_indicator.draw(filter=filter, pixelated=pixelated, blend_function=blend_function)
         return super().draw(filter=filter, pixelated=pixelated, blend_function=blend_function)
 
+    @property
+    def has_key(self):
+        return self.key_indicator is not None
+
+
+class ExitDoor(arcade.Sprite):
+
+    def __init__(self, x: float, y: float):
+        super().__init__(EXIT_DOOR_RESSOURCE, WALL_SCALING)
+        self.center_x = x
+        self.center_y = y
+        self._inner_wall = arcade.Sprite(WALL_RESSOURCE, WALL_SCALING * 0.75)  # smaller than a normal wall
+        self._inner_wall.center_x = x
+        self._inner_wall.center_y = y
+
+    @property
+    def inner_wall(self):
+        return self._inner_wall
+
 
 class GameWindow(arcade.Window):
 
@@ -118,6 +138,7 @@ class GameWindow(arcade.Window):
         self.doors: list[Door] = []
         self.player: Player
         self.exit_key: ExitKey
+        self.exit_door: ExitDoor
 
         self.map = load_map(MAP_RESSOURCE(media_dir))
 
@@ -137,6 +158,9 @@ class GameWindow(arcade.Window):
         for row in self.map:
             current_x = 0.0
             for cell in row:
+                if cell == "exit":
+                    self.exit_door = ExitDoor(current_x, current_y)
+                    self.walls.append(self.exit_door.inner_wall)
                 if cell == "wall":
                     wall = arcade.Sprite(WALL_RESSOURCE, WALL_SCALING)
                     wall.center_x = current_x
@@ -196,10 +220,14 @@ class GameWindow(arcade.Window):
             else:
                 d.close()
 
-        collides = arcade.check_for_collision(self.player, self.exit_key)
-        if collides:
+        key_collision = arcade.check_for_collision(self.player, self.exit_key)
+        if key_collision:
             self.exit_key.pickup()
             self.player.pickkey()
+
+        exit_collision = arcade.check_for_collision(self.player, self.exit_door)
+        if exit_collision and self.player.has_key:
+            self.exit_game()
 
         self.physics_engine.update()
         self.center_camera_to_player()
@@ -235,6 +263,10 @@ class GameWindow(arcade.Window):
         self.player.draw()
         self.exit_key.draw()
         self.walls.draw()
+        self.exit_door.draw()
         self.draw_welcome_message()
         self.draw_orientation()
         self.draw_symbols()
+
+    def exit_game(self):
+        self.close()
