@@ -10,7 +10,7 @@ CWD = pl.Path.cwd()
 DEFAULT_DATA_DIR = CWD / "data"
 DEFAULT_MODEL_FILE = CWD / "model.pkl"
 DEFAULT_MEDIA_DIR = CWD / "media"
-DEFAULT_CONTROL: ply.ControlType = "video"
+DEFAULT_CONTROL: ply.ControlType = "keyboard"
 
 logger = log.Logger()
 

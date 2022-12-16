@@ -3,10 +3,9 @@ from typing import Any, cast
 import cv2
 import numpy as np
 import numpy.typing as npt
-import pyglet
 
 from . import logger as log
-from .game.typings import Controller, Orientation
+from .game.typings import Controller, KeyDetector, Orientation
 from .typings import TrainArtifact
 from .videohandle import Result
 
@@ -24,7 +23,7 @@ class HandController(Controller):
         self._orientation: Orientation = DEFAULT_ORIENTATION
         self._symbol = DEFAULT_SYMBOL
 
-    def check_in(self, w: pyglet.window.Window) -> None:
+    def check_in(self, w: KeyDetector) -> None:
         pass
 
     @property
