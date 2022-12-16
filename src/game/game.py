@@ -61,6 +61,7 @@ class GameWindow(arcade.Window):
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE, screen=cast(Any, None))
 
         self.controller = controller
+        self.controller.check_in(self)
         self.media_dir = media_dir
 
         self.spawn: tuple[float, float]
