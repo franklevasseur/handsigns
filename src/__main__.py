@@ -10,6 +10,7 @@ CWD = pl.Path.cwd()
 DEFAULT_DATA_DIR = CWD / "data"
 DEFAULT_MODEL_FILE = CWD / "model.pkl"
 DEFAULT_MEDIA_DIR = CWD / "media"
+DEFAULT_CONTROL: ply.ControlType = "video"
 
 logger = log.Logger()
 
@@ -56,9 +57,23 @@ def predict(model: str):
 @cli.command()
 @click.option('--model', help='Path to trained model', default=DEFAULT_MODEL_FILE)
 @click.option('--media-dir', help='Path to media directory', default=DEFAULT_MEDIA_DIR)
-def play(model: str, media_dir: str):
+@click.option('--control', help='Weither to use keyboard of video to control the game', default=DEFAULT_CONTROL)
+def play(model: str, media_dir: str, control: ply.ControlType):
     """Play game."""
-    ply.play(pl.Path(model), pl.Path(media_dir), logger)
+    if control == "video":
+        ply.play({
+            'control': 'video',
+            'logger': logger,
+            'media_dir': pl.Path(media_dir),
+            'model_path': pl.Path(model),
+        })
+        return
+
+    ply.play({
+        'control': 'keyboard',
+        'logger': logger,
+        'media_dir': pl.Path(media_dir),
+    })
 
 
 @cli.command()

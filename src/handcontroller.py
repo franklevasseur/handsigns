@@ -3,6 +3,7 @@ from typing import Any, cast
 import cv2
 import numpy as np
 import numpy.typing as npt
+import pyglet
 
 from . import logger as log
 from .game.typings import Controller, Orientation
@@ -22,6 +23,9 @@ class HandController(Controller):
         self.logger = logger
         self._orientation: Orientation = DEFAULT_ORIENTATION
         self._symbol = DEFAULT_SYMBOL
+
+    def check_in(self, w: pyglet.window.Window) -> None:
+        pass
 
     @property
     def orientation(self) -> Orientation:
